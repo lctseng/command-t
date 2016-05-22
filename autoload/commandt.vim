@@ -152,6 +152,7 @@ augroup END
 
 ruby << EOF
   # require Ruby files
+  load_platform_version = false
   begin
     require 'command-t'
 
@@ -169,8 +170,17 @@ ruby << EOF
     end
   rescue LoadError
     load_path_modified = false
+    if !load_platform_version
+      load_platform_version = true
+      load_path_modified = true
+      ruby_path = "ruby-platform-#{`uname -s`.chop}-#{`uname -m`.chop}-#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
+    else
+      # fallback to default path
+      ruby_path = "ruby"
+    end
     ::VIM::evaluate('&runtimepath').to_s.split(',').each do |path|
-      lib = "#{path}/ruby"
+      lib = "#{path}/#{ruby_path}"
+      system("echo '#{lib}' >> /tmp/load_path")
       if !$LOAD_PATH.include?(lib) && File.exist?(lib)
         $LOAD_PATH << lib
         load_path_modified = true

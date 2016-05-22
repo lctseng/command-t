@@ -3,3 +3,4 @@
 /.bundle
 /data/log.yml
 vendor/bundle
+/ruby-platform*
